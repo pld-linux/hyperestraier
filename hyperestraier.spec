@@ -12,7 +12,7 @@ BuildRequires:	qdbm-devel
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define	_libexecdir %{_libdir}/%{name}
+%define		_libexecdir	%{_libdir}/%{name}
 
 %description
 Hyper Estraier is a full-text search system. You can search lots of
@@ -99,6 +99,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/*
 # don't move it to /usr/lib/cgi-bin - write your wrapper (sh script),
 # utilize SCRIPT_NAME env. var. and put into your cgi-bin directory
+%dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/*.cgi
 %{_mandir}/man1/*
 %dir %{_datadir}/%{name}
