@@ -23,17 +23,17 @@ servers.
 
 The characteristic of Hyper Estraier is the following.
 
-     * High performance of search
-     * High scalability of target documents
-     * Perfect recall ratio by N-gram method
-     * High precision by hybrid mechanism of N-gram and morphological
-     * analyzer
-     * Phrase search, regular expressions, attribute search, and
-     * similarity search
-     * Multilingualism with Unicode
-     * Independent of file format and repository
-     * Simple and powerful API
-     * Supporting P2P architecture
+     - High performance of search
+     - High scalability of target documents
+     - Perfect recall ratio by N-gram method
+     - High precision by hybrid mechanism of N-gram and morphological
+     - analyzer
+     - Phrase search, regular expressions, attribute search, and
+     - similarity search
+     - Multilingualism with Unicode
+     - Independent of file format and repository
+     - Simple and powerful API
+     - Supporting P2P architecture
 
 #%%description -l pl
 
@@ -55,7 +55,8 @@ Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
-This is the package containing the header files for hyperestraier library.
+This is the package containing the header files for hyperestraier
+library.
 
 %description devel -l pl
 Ten pakiet zawiera pliki nag³ówkowe biblioteki hyperestraier.
