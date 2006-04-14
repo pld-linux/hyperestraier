@@ -21,32 +21,49 @@ web site, it is useful as your own search engine for pages in your
 site. Also, it is useful as search utilities of mail boxes and file
 servers.
 
-The characteristic of Hyper Estraier is the following.
+The characteristic of Hyper Estraier is the following:
+ - High performance of search
+ - High scalability of target documents
+ - Perfect recall ratio by N-gram method
+ - High precision by hybrid mechanism of N-gram and morphological
+   analyzer
+ - Phrase search, regular expressions, attribute search, and
+   similarity search
+ - Multilingualism with Unicode
+ - Independent of file format and repository
+ - Simple and powerful API
+ - Supporting P2P architecture
 
-     - High performance of search
-     - High scalability of target documents
-     - Perfect recall ratio by N-gram method
-     - High precision by hybrid mechanism of N-gram and morphological
-     - analyzer
-     - Phrase search, regular expressions, attribute search, and
-     - similarity search
-     - Multilingualism with Unicode
-     - Independent of file format and repository
-     - Simple and powerful API
-     - Supporting P2P architecture
+%description -l pl
+Hyper Estraier to system wyszukiwania pe³notekstowego. Pozwala
+przeszukiwaæ wiele dokumentów, aby odnale¼æ dokumenty zawieraj±ce
+podane s³owa. W przypadku uruchomienia na stronie WWW, mo¿e byæ
+przydatny jako w³asna wyszukiwarka stron we w³asnym serwisie. Jest
+przydatny tak¿e do przeszukiwania skrzynek pocztowych i serwerów
+plików.
 
-#%%description -l pl
+Charakterystyka Hyper Estraiera:
+ - du¿a wydajno¶æ przeszukiwania
+ - du¿a skalowalno¶æ dokumentów docelowych
+ - doskona³y wspó³czynnik odwo³añ przy u¿yciu metody N-gramowej
+ - wysoka precyzja przy u¿yciu hybrydowego mechanizmu N-gramowego i
+   analizatora morfologicznego
+ - wyszukiwanie fraz, wyra¿eñ regularnych, atrybutów oraz podobieñst
+ - wielojêzyczno¶æ z Unicode
+ - niezale¿no¶æ od formatu plików i repozytorium
+ - proste i potê¿ne API
+ - obs³uga architektury P2P
 
 %package libs
-Summary:	hyperestraier
-Summary(pl):	hyperestraier
+Summary:	hyperestraier libraries
+Summary(pl):	Biblioteki hyperestraiera
 Group:		Libraries
 
 %description libs
 hyperestraier libraries - full-text search system.
 
 %description libs -l pl
-Biblioteki hyperestraier - pe³notekstowego systemu wyszukiwawczego.
+Biblioteki hyperestraiera - pe³notekstowego systemu wyszukiwawczego.
 
 %package devel
 Summary:	Header files for hyperestraier library
