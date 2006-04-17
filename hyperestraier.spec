@@ -2,13 +2,14 @@ Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.2.1
-Release:	0.1
+Release:	0.3
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
 # Source0-md5:	91e2c859510a9e30fad8b49f6affe6f1
+Source1:	%{name}.sh
 URL:		http://hyperestraier.sourceforge.net/
-BuildRequires:	qdbm-devel >= 1.8.48
+BuildRequires:	qdbm-devel >= 1.8.48-0.3
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -104,6 +105,7 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 rm -fr $RPM_BUILD_ROOT%{_datadir}/%{name}/{COPYING,ChangeLog,THANKS,doc}
+install %{SOURCE1} .
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -113,10 +115,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc ChangeLog README THANKS
+%doc ChangeLog README THANKS hyperestraier.sh
 %attr(755,root,root) %{_bindir}/*
-# don't move it to /usr/lib/cgi-bin - write your wrapper (sh script),
-# utilize SCRIPT_NAME env. var. and put into your cgi-bin directory
+# don't move cgi binaries to /usr/lib/cgi-bin - write your own wrapper
+# (shell script) instead, utilize SCRIPT_NAME env. var. and put into
+# your cgi-bin directory
 %dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/*.cgi
 %{_mandir}/man1/*
