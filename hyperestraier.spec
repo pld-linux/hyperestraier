@@ -116,7 +116,13 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc ChangeLog README THANKS hyperestraier.sh
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_bindir}/estcall
+%attr(755,root,root) %{_bindir}/estcmd
+%attr(755,root,root) %{_bindir}/estload
+%attr(755,root,root) %{_bindir}/estmaster
+%attr(755,root,root) %{_bindir}/estmttest
+%attr(755,root,root) %{_bindir}/estwaver
+%attr(755,root,root) %{_bindir}/estwolefind
 # don't move cgi binaries to /usr/lib/cgi-bin - write your own wrapper
 # (shell script) instead, utilize SCRIPT_NAME env. var. and put into
 # your cgi-bin directory
@@ -153,6 +159,7 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %doc doc/*
+%attr(755,root,root) %{_bindir}/estconfig
 %attr(755,root,root) %{_libdir}/lib*.so
 %{_includedir}/*.h
 %{_pkgconfigdir}/*.pc
