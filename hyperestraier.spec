@@ -1,15 +1,27 @@
+#
+# Conditional build:
+%bcond_with	java # Java bindings
+%bcond_without	ruby # Ruby bindings
+%bcond_without	static_libs # don't build static libraries
+#
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.2.2
-Release:	0.1
+Release:	0.2
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
 # Source0-md5:	217cd4569d431972b2f9d75ac35239f1
 Source1:	%{name}.sh
+Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool
 BuildRequires:	qdbm-devel >= 1.8.48-0.3
+%{?with_java:BuildRequires:	jdk}
+%{?with_ruby:BuildRequires:	ruby-devel}
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -91,18 +103,109 @@ Static hyperestraier library.
 %description static -l pl
 Statyczna biblioteka hyperestraier.
 
+%package javanative
+Summary:	Java native bindings
+Group:		Development/Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description javanative
+Java native bindings.
+
+%package javapure
+Summary:	Java pure bindings
+Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description javapure
+Java pure bindings.
+
+%package rubynative
+Summary:	Ruby native bindings
+Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+%ruby_ver_requires_eq
+
+%description rubynative
+Ruby native bindings.
+
+%package rubypure
+Summary:	Ruby pure bindings
+Group:		Development/Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+%ruby_ver_requires_eq
+
+%description rubypure
+Ruby pure bindings.
+
 %prep
 %setup -q
+%patch0 -p1
 
 %build
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__automake}
+%configure \
+	--enable-static=%{?with_static_libs:yes}%{!?with_static_libs:no}
+%{__make}
+
+%if %{with java}
+cd javanative
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__automake}
 %configure
 %{__make}
+cd -
+
+cd javapure
+%{__aclocal}
+%{__autoconf}
+#{__automake}
+%configure
+%{__make}
+cd -
+%endif
+
+%if %{with ruby}
+cd rubynative
+%{__aclocal}
+%{__autoconf}
+%configure
+%{__make}
+cd -
+
+cd rubypure
+%{__aclocal}
+%{__autoconf}
+%configure
+%{__make}
+cd -
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+%if %{with java}
+%{__make} -C javanative install \
+	DESTDIR=$RPM_BUILD_ROOT
+
+%{__make} -C javapure install \
+	DESTDIR=$RPM_BUILD_ROOT
+%endif
+
+%if %{with ruby}
+%{__make} -C rubynative install \
+	DESTDIR=$RPM_BUILD_ROOT
+
+%{__make} -C rubypure install \
+	DESTDIR=$RPM_BUILD_ROOT
+%endif
 
 rm -fr $RPM_BUILD_ROOT%{_datadir}/%{name}/{COPYING,ChangeLog,THANKS,doc}
 install %{SOURCE1} .
@@ -128,6 +231,7 @@ rm -rf $RPM_BUILD_ROOT
 # your cgi-bin directory
 %dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/*.cgi
+%attr(755,root,root) %{_libexecdir}/*.fcgi
 %{_mandir}/man1/*
 %dir %{_datadir}/%{name}
 # config templates - don't add to %%config, don't move it to /etc
@@ -168,3 +272,21 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/lib*.a
+
+%files javanative
+%defattr(644,root,root,755)
+%{_libdir}/estraier.jar
+
+%files javapure
+%defattr(644,root,root,755)
+%{_libdir}/estraierpure.jar
+
+%files rubynative
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/estcmd.rb
+%attr(755,root,root) %{ruby_sitearchdir}/estraier.so
+
+%files rubypure
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/estcall.rb
+%{ruby_sitelibdir}/estraierpure.rb
