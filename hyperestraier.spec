@@ -104,29 +104,29 @@ Static hyperestraier library.
 Statyczna biblioteka hyperestraier.
 
 %package javanative
-Summary:	Java native bindings
+Summary:	Java native bindings for hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description javanative
-Java native bindings.
+Java native bindings for hyperestraier.
 
 %package javapure
-Summary:	Java pure bindings
+Summary:	Java pure bindings for hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description javapure
-Java pure bindings.
+Java pure bindings for hyperestraier.
 
 %package rubynative
-Summary:	Ruby native bindings
+Summary:	Ruby native bindings for hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 %ruby_ver_requires_eq
 
 %description rubynative
-Ruby native bindings.
+Ruby native bindings for hyperestraier.
 
 %package rubypure
 Summary:	Ruby pure bindings
@@ -135,7 +135,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %ruby_ver_requires_eq
 
 %description rubypure
-Ruby pure bindings.
+Ruby pure bindings for hyperestraier.
 
 %prep
 %setup -q
@@ -207,7 +207,6 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 %endif
 
-rm -fr $RPM_BUILD_ROOT%{_datadir}/%{name}/{COPYING,ChangeLog,THANKS,doc}
 install %{SOURCE1} .
 
 %clean
