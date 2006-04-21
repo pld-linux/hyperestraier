@@ -1,0 +1,550 @@
+diff -Nur o.hyperestraier-1.2.2/Makefile.am n.hyperestraier-1.2.2/Makefile.am
+--- o.hyperestraier-1.2.2/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ n.hyperestraier-1.2.2/Makefile.am	2006-04-21 22:32:24.000000000 +0200
+@@ -0,0 +1,74 @@
++AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
++				-DPIC=1 -D_REENTRANT=1 @MYDEFS@
++
++AM_CFLAGS = -Wall -ansi -pedantic -fsigned-char
++
++lib_LTLIBRARIES = libestraier.la
++libestraier_la_SOURCES = estraier.c estmtdb.c estnode.c md5.c
++libestraier_la_LDFLAGS = -version-info @LIBVER@:@LIBREV@:@LIBAGE@
++
++include_HEADERS = estraier.h estmtdb.h estnode.h 
++
++bin_PROGRAMS = estcmd estmttest estmaster estcall estwaver estload
++
++estcmd_SOURCES = estcmd.c mymorph.c
++estcmd_LDADD = libestraier.la
++
++estmttest_SOURCES = estmttest.c
++estmttest_LDADD = libestraier.la
++
++estmaster_SOURCES = estmaster.c mastermod.c myimage.dat
++estmaster_LDADD = libestraier.la
++
++estcall_SOURCES = estcall.c
++estcall_LDADD = libestraier.la
++
++estwaver_SOURCES = estwaver.c wavermod.c mymorph.c
++estwaver_LDADD = libestraier.la
++
++estload_SOURCES = estload.c
++estload_LDADD = libestraier.la
++
++libexec_PROGRAMS = estseek.cgi estseek.fcgi
++estseek_cgi_SOURCES = estseek.c
++estseek_cgi_LDADD = libestraier.la 
++
++estseek_fcgi_SOURCES = estseek.c
++estseek_fcgi_CPPFLAGS = $(AM_CPPFLAGS) -DMYFCGI -I$(includedir)/fastcgi
++estseek_fcgi_LDADD = libestraier.la
++estseek_fcgi_LDFLAGS = -lfcgi
++
++bin_SCRIPTS = estconfig estwolefind
++
++man1_MANS = man/estconfig.1 man/estcmd.1 man/estmaster.1 man/estwaver.1 man/estcall.1
++man3_MANS = man/estraier.3 man/estnode.3
++
++dist_pkgdata_DATA = \
++	estseek.conf \
++	estseek.tmpl \
++	estseek.top \
++	estresult.dtd \
++	estraier.idl 
++
++pkgdatafilterdir = $(pkgdatadir)/filter
++pkgdatafilter_DATA = \
++	filter/estfxmantotxt \
++	filter/estfxmsotohtml \
++	filter/estfxasis \
++	filter/estfxpdftohtml \
++	filter/estwnetxpnd \
++	filter/estfxxdwtotxt
++
++pkgdataincremdir = $(pkgdatadir)/increm
++pkgdataincrem_DATA = \
++	increm/estseek-frame.html \
++	increm/estseek-form.html
++
++pkgdatalocalejadir = $(pkgdatadir)/locale/ja
++pkgdatalocaleja_DATA = \
++	locale/ja/estseek.conf \
++	locale/ja/estseek.tmpl \
++	locale/ja/estseek.top
++
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = hyperestraier.pc
+diff -Nur o.hyperestraier-1.2.2/configure.in n.hyperestraier-1.2.2/configure.in
+--- o.hyperestraier-1.2.2/configure.in	2006-04-10 03:25:26.000000000 +0200
++++ n.hyperestraier-1.2.2/configure.in	2006-04-21 22:32:23.000000000 +0200
+@@ -9,12 +9,14 @@
+ 
+ # Targets
+ AC_INIT(hyperestraier, 1.2.2)
++AM_INIT_AUTOMAKE([])
+ 
+ # Export variables
+-LIBVER=8
+-LIBREV=7
++LIBVER=15
++LIBREV=0
++LIBAGE=7
+ PROTVER="1.0"
+-MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
++MYCFLAGS=""
+ MYCPPOPTS=""
+ MYDEFS=""
+ MYLDOPTS=""
+@@ -24,72 +26,12 @@
+ MYRUNPATH=""
+ MYPOSTCMD="true"
+ 
+-# Building paths
+-pathtmp="$PATH"
+-PATH="$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+-PATH="$PATH:/usr/ccs/bin:/usr/ucb:/usr/xpg4/bin:/usr/xpg6/bin:$pathtmp"
+-LIBRARY_PATH="$HOME/lib:/usr/local/lib:$LIBRARY_PATH"
+-LD_LIBRARY_PATH="$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+-CPATH="$HOME/include:/usr/local/include:$CPATH"
+-PKG_CONFIG_PATH="$HOME/lib/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
+-export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-if type pkg-config > /dev/null 2>&1
+-then
+-  PATH="$PATH:`pkg-config --variable=bindir qdbm`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir qdbm`"
+-  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-fi
+-
+-
++AC_PROG_LIBTOOL
+ 
+ #================================================================
+ # Options
+ #================================================================
+ 
+-
+-# Internal variables
+-enables=""
+-
+-# Debug mode
+-AC_ARG_ENABLE(debug,
+-  AC_HELP_STRING([--enable-debug], [build for debugging]))
+-if test "$enable_debug" = "yes"
+-then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g"
+-  MYLDOPTS="-static"
+-  enables="$enables (debug)"
+-fi
+-
+-# Developping mode
+-AC_ARG_ENABLE(devel,
+-  AC_HELP_STRING([--enable-devel], [build for development]))
+-if test "$enable_devel" = "yes"
+-then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -O2 -pipe"
+-  MYPOSTCMD="sync ; sync"
+-  enables="$enables (devel)"
+-fi
+-
+-# Profiling mode
+-AC_ARG_ENABLE(profile,
+-  AC_HELP_STRING([--enable-profile], [build for profiling]))
+-if test "$enable_profile" = "yes"
+-then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -pg -O2 -Werror"
+-  enables="$enables (profile)"
+-fi
+-
+-# Static mode
+-AC_ARG_ENABLE(static,
+-  AC_HELP_STRING([--enable-static], [link statically]))
+-if test "$enable_static" = "yes"
+-then
+-  MYLDOPTS="-static"
+-  enables="$enables (static)"
+-fi
+-
+ # Enable MeCab morphological analyzer
+ AC_ARG_ENABLE(mecab,
+   AC_HELP_STRING([--enable-mecab], [feature mecab morphological analyzer]))
+@@ -127,6 +69,7 @@
+   enables="$enables (bzip)"
+ fi
+ 
++
+ # Messages
+ printf '#================================================================\n'
+ printf '# Configuring Hyper Estraier version %s%s.\n' "$PACKAGE_VERSION" "$enables"
+@@ -162,25 +105,12 @@
+ AC_CHECK_LIB(qdbm, main)
+ 
+ # For libraries of pthreads
+-AC_CHECK_LIB(pthread, main, MYMTLIBS="-lpthread $MYMTLIBS")
++AC_CHECK_LIB(pthread, main)
+ 
+ # For libraries of socket
+-AC_CHECK_LIB(nsl, main, MYSKLIBS="-lnsl $MYSKLIBS")
+-AC_CHECK_LIB(socket, main, MYSKLIBS="-lsocket $MYSKLIBS")
+-AC_CHECK_LIB(resolv, main, MYSKLIBS="-lresolv $MYSKLIBS")
+-
+-# For old BSDs
+-if uname -a | grep BSD > /dev/null &&
+-  test -f /usr/lib/libc_r.a && test ! -f /usr/lib/libpthread.a
+-then
+-  LIBS=`printf '%s' "$LIBS" | sed 's/-lc/-lc_r/g'`
+-fi
+-
+-# Set the runtime library path
+-if test "$prefix" != "NONE"
+-then
+-  MYRUNPATH="$prefix/lib"
+-fi
++AC_CHECK_LIB(nsl, main)
++AC_CHECK_LIB(socket, main,)
++AC_CHECK_LIB(resolv, main,)
+ 
+ # Checking the version of QDBM with pkg-config
+ if type pkg-config > /dev/null 2>&1
+@@ -207,6 +137,7 @@
+ # Export variables
+ AC_SUBST(LIBVER)
+ AC_SUBST(LIBREV)
++AC_SUBST(LIBAGE)
+ AC_SUBST(PROTVER)
+ AC_SUBST(MYCFLAGS)
+ AC_SUBST(MYCPPOPTS)
+diff -Nur o.hyperestraier-1.2.2/javanative/Makefile.am n.hyperestraier-1.2.2/javanative/Makefile.am
+--- o.hyperestraier-1.2.2/javanative/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ n.hyperestraier-1.2.2/javanative/Makefile.am	2006-04-21 22:32:24.000000000 +0200
+@@ -0,0 +1,29 @@
++AM_CPPFLAGS = -I.. \
++  -I$(MYJAVAHOME)/include -I$(MYJAVAHOME)/include/$(JVMPLATFORM) -I$(MYJAVAHOME)/Headers \
++  -D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
++  -DPIC=1 -D_REENTRANT=1 -DNDEBUG @MYCPPOPTS@ @DEFS@
++
++AM_CFLAGS = -Wall -pedantic -fsigned-char
++
++lib_LTLIBRARIES = libjestraier.la
++libjestraier_la_SOURCES = condition.c database.c document.c myconf.c result.c
++libjestraier_la_LDFLAGS = -version-info @LIBVER@:@LIBREV@:@LIBAGE@
++libjestraier_la_LIBADD = ../libestraier.la 
++##@QDBM_LIBS@ @SKLIBS@ @MTLIBS@
++
++estraierdir = $(libdir)
++estraier_JAVA = \
++	Cmd.java \
++	Condition.java \
++	Database.java \
++	Document.java \
++	Result.java \
++	Utility.java
++
++install-estraierJAVA: classestraier.stamp
++	@JAR@ cvf estraier.jar estraier/*.class ; \
++	test -z "$(estraierdir)" || $(mkdir_p) "$(DESTDIR)$(estraierdir)" ; \
++	echo " $(INSTALL_DATA) 'estraier.jar' '$(DESTDIR)$(estraierdir)/'"; \
++	$(INSTALL_DATA) "estraier.jar" "$(DESTDIR)$(estraierdir)/";
++
++
+diff -Nur o.hyperestraier-1.2.2/javanative/configure.in n.hyperestraier-1.2.2/javanative/configure.in
+--- o.hyperestraier-1.2.2/javanative/configure.in	2006-01-25 07:27:42.000000000 +0100
++++ n.hyperestraier-1.2.2/javanative/configure.in	2006-04-21 22:32:24.000000000 +0200
+@@ -9,46 +9,33 @@
+ 
+ # Targets
+ AC_INIT(hyperestraier-javanative, 1.0.0)
++AM_INIT_AUTOMAKE([])
+ 
+ # Export variables
+ LIBVER=1
+ LIBREV=0
+-MYJAVAHOME="/usr/java"
++LIBAGE=0
++MYJAVAHOME="/usr/lib/java"
+ JVMPLATFORM="linux"
+ JAVAC="javac"
+ JAR="jar"
+ JAVAH="javah"
+ JAVADOC="javadoc"
+ JAVARUN="java"
+-MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
++#MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
+ MYCPPOPTS=""
+ MYLDOPTS=""
+ MYMTLIBS=""
+ MYSKLIBS=""
+ MYRUNPATH=""
+ 
+-# Building paths
+-pathtmp="$PATH"
+-PATH="..:$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+-PATH="$PATH:/usr/ccs/bin:/usr/ucb:/usr/xpg4/bin:/usr/xpg6/bin:$pathtmp"
+-LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LIBRARY_PATH"
+-LD_LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+-CPATH="..:$HOME/include:/usr/local/include:$CPATH"
+-PKG_CONFIG_PATH="..:$HOME/lib/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
+-export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-if type pkg-config > /dev/null 2>&1
+-then
+-  PATH="$PATH:`pkg-config --variable=bindir qdbm`"
+-  PATH="$PATH:`pkg-config --variable=bindir hyperestraier`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir qdbm`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir hyperestraier`"
+-  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-fi
++AC_PROG_LIBTOOL
+ 
++PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
++export PKG_CONFIG_PATH
++PKG_PROG_PKG_CONFIG
++PKG_CHECK_MODULES(QDBM, qdbm)
++PKG_CHECK_MODULES(HYPERESTRAIER, hyperestraier)
+ 
+ 
+ #================================================================
+@@ -175,6 +162,7 @@
+ # Export variables
+ AC_SUBST(LIBVER)
+ AC_SUBST(LIBREV)
++AC_SUBST(LIBAGE)
+ AC_SUBST(MYJAVAHOME)
+ AC_SUBST(JVMPLATFORM)
+ AC_SUBST(JAVAC)
+diff -Nur o.hyperestraier-1.2.2/javapure/configure.in n.hyperestraier-1.2.2/javapure/configure.in
+--- o.hyperestraier-1.2.2/javapure/configure.in	2006-01-25 07:27:50.000000000 +0100
++++ n.hyperestraier-1.2.2/javapure/configure.in	2006-04-21 22:32:24.000000000 +0200
+@@ -13,7 +13,7 @@
+ # Export variables
+ LIBVER=1
+ LIBREV=0
+-MYJAVAHOME="/usr/java"
++MYJAVAHOME="/usr/lib/java"
+ JVMPLATFORM="linux"
+ JAVAC="javac"
+ JAR="jar"
+@@ -22,26 +22,12 @@
+ JAVARUN="java"
+ 
+ # Building paths
+-pathtmp="$PATH"
+-PATH="..:$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+-PATH="$PATH:/usr/ccs/bin:/usr/ucb:/usr/xpg4/bin:/usr/xpg6/bin:$pathtmp"
+-LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LIBRARY_PATH"
+-LD_LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+-CPATH="..:$HOME/include:/usr/local/include:$CPATH"
+-PKG_CONFIG_PATH="..:$HOME/lib/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
+-export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-if type pkg-config > /dev/null 2>&1
+-then
+-  PATH="$PATH:`pkg-config --variable=bindir qdbm`"
+-  PATH="$PATH:`pkg-config --variable=bindir hyperestraier`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir qdbm`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir hyperestraier`"
+-  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-fi
++PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
++export PKG_CONFIG_PATH
++PKG_PROG_PKG_CONFIG
++PKG_CHECK_MODULES(QDBM, qdbm)
++PKG_CHECK_MODULES(HYPERESTRAIER, hyperestraier)
++
+ 
+ 
+ 
+diff -Nur o.hyperestraier-1.2.2/rubynative/Makefile.in n.hyperestraier-1.2.2/rubynative/Makefile.in
+--- o.hyperestraier-1.2.2/rubynative/Makefile.in	2005-11-24 18:36:57.000000000 +0100
++++ n.hyperestraier-1.2.2/rubynative/Makefile.in	2006-04-21 22:32:24.000000000 +0200
+@@ -22,13 +22,13 @@
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+ MYRBLIBDIR = @MYRBLIBDIR@
++MYRBARCHDIR = @MYRBARCHDIR@
+ MYRBBINDIR = @bindir@
+ DESTDIR =
+ 
+ # Building binaries
+ RUBY = @RUBY@
+ RDOC = @RDOC@
+-RUNENV = LD_LIBRARY_PATH=.:..:/lib:/usr/lib:$(HOME)/lib:/usr/local/lib:@MYRUNPATH@
+ 
+ 
+ 
+@@ -53,7 +53,8 @@
+ 
+ install :
+ 	mkdir -p $(DESTDIR)$(MYRBLIBDIR)
+-	( cd src && cp -Rf $(MYRBLIBS) $(DESTDIR)$(MYRBLIBDIR) )
++	mkdir -p $(DESTDIR)$(MYRBARCHDIR)
++	( cd src && cp -Rf $(MYRBLIBS) $(DESTDIR)$(MYRBARCHDIR) )
+ 	mkdir -p $(DESTDIR)$(MYRBBINDIR)
+ 	cp -Rf $(MYRBBINS) $(DESTDIR)$(MYRBBINDIR)
+ 	@printf '\n'
+@@ -63,7 +64,7 @@
+ 
+ 
+ uninstall :
+-	cd $(DESTDIR)$(MYRBLIBDIR) && rm -f $(MYRBLIBS)
++	cd $(DESTDIR)$(MYRBARCHDIR) && rm -f $(MYRBLIBS)
+ 	cd $(DESTDIR)$(MYRBBINDIR) && rm -f $(MYRBBINS)
+ 
+ 
+@@ -81,21 +82,21 @@
+ 
+ check :
+ 	rm -rf casket
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test001.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test002.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test003.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test004.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test005.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test006.est
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb edit casket 1 "@title" "java"
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb get casket 1
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb get casket 1 "@title"
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb out casket 1
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb inform casket
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb optimize casket
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb search \
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test001.est
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test002.est
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test003.est
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test004.est
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test005.est
++	$(RUBY) -I./src -w -d estcmd.rb put casket ../misc/test006.est
++	$(RUBY) -I./src -w -d estcmd.rb edit casket 1 "@title" "java"
++	$(RUBY) -I./src -w -d estcmd.rb get casket 1
++	$(RUBY) -I./src -w -d estcmd.rb get casket 1 "@title"
++	$(RUBY) -I./src -w -d estcmd.rb out casket 1
++	$(RUBY) -I./src -w -d estcmd.rb inform casket
++	$(RUBY) -I./src -w -d estcmd.rb optimize casket
++	$(RUBY) -I./src -w -d estcmd.rb search \
+ 	  -vf -cd casket "estraier" > check.out
+-	$(RUNENV) $(RUBY) -I./src -w -d estcmd.rb search \
++	$(RUBY) -I./src -w -d estcmd.rb search \
+ 	  -vs -gs -attr "@uri" -ord "@mdate NUMD" -max 1 casket "estraier OR mikio" > check.out
+ 	rm -rf casket
+ 
+diff -Nur o.hyperestraier-1.2.2/rubynative/configure.in n.hyperestraier-1.2.2/rubynative/configure.in
+--- o.hyperestraier-1.2.2/rubynative/configure.in	2006-01-25 07:27:58.000000000 +0100
++++ n.hyperestraier-1.2.2/rubynative/configure.in	2006-04-21 22:32:24.000000000 +0200
+@@ -17,27 +17,11 @@
+ MYRUNPATH=""
+ 
+ # Building paths
+-pathtmp="$PATH"
+-PATH="..:$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+-PATH="$PATH:/usr/ccs/bin:/usr/ucb:/usr/xpg4/bin:/usr/xpg6/bin:$pathtmp"
+-LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LIBRARY_PATH"
+-LD_LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+-CPATH="..:$HOME/include:/usr/local/include:$CPATH"
+-PKG_CONFIG_PATH="..:$HOME/lib/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
+-export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-if type pkg-config > /dev/null 2>&1
+-then
+-  PATH="$PATH:`pkg-config --variable=bindir qdbm`"
+-  PATH="$PATH:`pkg-config --variable=bindir hyperestraier`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir qdbm`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir hyperestraier`"
+-  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-fi
+-
++PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
++export PKG_CONFIG_PATH
++PKG_PROG_PKG_CONFIG
++PKG_CHECK_MODULES(QDBM, qdbm)
++PKG_CHECK_MODULES(HYPERESTRAIER, hyperestraier)
+ 
+ 
+ #================================================================
+@@ -67,6 +51,12 @@
+ then
+   MYRBLIBDIR="$myrblibdir"
+ fi
++myrbarchdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("sitearchdir"))'`
++if test -n "$myrbarchdir"
++then
++  MYRBARCHDIR="$myrbarchdir"
++fi
++
+ 
+ # Checking the version of QDBM with pkg-config
+ if type pkg-config > /dev/null 2>&1 && pkg-config --atleast-version=1.0.0 qdbm
+@@ -85,6 +75,7 @@
+ AC_SUBST(RUBY)
+ AC_SUBST(RDOC)
+ AC_SUBST(MYRBLIBDIR)
++AC_SUBST(MYRBARCHDIR)
+ AC_SUBST(MYRUNPATH)
+ 
+ # Targets
+diff -Nur o.hyperestraier-1.2.2/rubynative/src/extconf.rb n.hyperestraier-1.2.2/rubynative/src/extconf.rb
+--- o.hyperestraier-1.2.2/rubynative/src/extconf.rb	2006-01-17 09:45:22.000000000 +0100
++++ n.hyperestraier-1.2.2/rubynative/src/extconf.rb	2006-04-21 22:32:24.000000000 +0200
+@@ -2,12 +2,12 @@
+ 
+ dir_config('estraier')
+ 
+-ENV["PATH"] = ENV["PATH"] + ":/usr/local/bin:.:..:../.."
++ENV["PATH"] = ENV["PATH"] + ".:..:../.."
+ estcflags = `estconfig --cflags`.chomp
+ estldflags = `estconfig --ldflags`.chomp
+ estlibs = `estconfig --libs`.chomp
+ $CFLAGS = "-I. -I.. -I../.. #{estcflags} -Wall #{$CFLAGS}"
+-$LDFLAGS = "#{$LDFLAGS} -L. -L.. -L../.. #{estldflags}"
++$LDFLAGS = "#{$LDFLAGS} -L. -L.. -L../.. -L../../.libs #{estldflags}"
+ $libs = "#{$libs} #{estlibs}"
+ 
+ if have_header('estraier.h') and have_library('estraier')
+diff -Nur o.hyperestraier-1.2.2/rubypure/configure.in n.hyperestraier-1.2.2/rubypure/configure.in
+--- o.hyperestraier-1.2.2/rubypure/configure.in	2006-01-25 07:28:05.000000000 +0100
++++ n.hyperestraier-1.2.2/rubypure/configure.in	2006-04-21 22:32:24.000000000 +0200
+@@ -16,28 +16,11 @@
+ MYRBLIBDIR=/usr/local/lib/ruby/site_ruby
+ 
+ # Building paths
+-pathtmp="$PATH"
+-PATH="..:$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+-PATH="$PATH:/usr/ccs/bin:/usr/ucb:/usr/xpg4/bin:/usr/xpg6/bin:$pathtmp"
+-LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LIBRARY_PATH"
+-LD_LIBRARY_PATH="..:$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+-CPATH="..:$HOME/include:/usr/local/include:$CPATH"
+-PKG_CONFIG_PATH="..:$HOME/lib/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
+-export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-if type pkg-config > /dev/null 2>&1
+-then
+-  PATH="$PATH:`pkg-config --variable=bindir qdbm`"
+-  PATH="$PATH:`pkg-config --variable=bindir hyperestraier`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LIBRARY_PATH="$LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir qdbm`"
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:`pkg-config --variable=libdir hyperestraier`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir qdbm`"
+-  CPATH="$CPATH:`pkg-config --variable=includedir hyperestraier`"
+-  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
+-fi
+-
+-
++PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
++export PKG_CONFIG_PATH
++PKG_PROG_PKG_CONFIG
++PKG_CHECK_MODULES(QDBM, qdbm)
++PKG_CHECK_MODULES(HYPERESTRAIER, hyperestraier)
+ 
+ #================================================================
+ # Checking Commands and Libraries
