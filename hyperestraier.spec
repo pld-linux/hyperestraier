@@ -7,12 +7,12 @@
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
-Version:	1.2.2
-Release:	0.2
+Version:	1.2.3
+Release:	0.1
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
-# Source0-md5:	217cd4569d431972b2f9d75ac35239f1
+# Source0-md5:	6689cd0b89d5bfd1e086aeb558546c71
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
