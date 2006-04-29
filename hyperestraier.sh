@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# WARNING!!! - NOT TESTED 
+# WARNING - USE WITH CAUTION - NOT WIDELY TESTED
 
 # what should it do:
 # 1. create directory skeleton
