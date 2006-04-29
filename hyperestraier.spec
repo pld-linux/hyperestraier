@@ -1,14 +1,15 @@
 #
 # Conditional build:
-%bcond_with	java # Java bindings
-%bcond_without	ruby # Ruby bindings
-%bcond_without	static_libs # don't build static libraries
+%bcond_without	fcgi	# build estseek.fcgi
+%bcond_with	java	# Java bindings
+%bcond_without	ruby	# Ruby bindings
+%bcond_without	static_libs	# don't build static libraries
 #
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.2.3
-Release:	0.1
+Release:	1
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
@@ -18,6 +19,7 @@ Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
+%{?with_fcgi:BuildRequires:	fcgi-devel}
 BuildRequires:	libtool
 BuildRequires:	qdbm-devel >= 1.8.48-0.3
 %{?with_java:BuildRequires:	jdk}
@@ -113,8 +115,8 @@ Java native bindings for hyperestraier.
 
 %package javapure
 Summary:	Java pure bindings for hyperestraier
+License:	BSD-style
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
 
 %description javapure
 Java pure bindings for hyperestraier.
@@ -130,8 +132,8 @@ Ruby native bindings for hyperestraier.
 
 %package rubypure
 Summary:	Ruby pure bindings
+License:	BSD-style
 Group:		Development/Libraries
-Requires:	%{name}-libs = %{version}-%{release}
 %ruby_ver_requires_eq
 
 %description rubypure
@@ -147,6 +149,7 @@ Ruby pure bindings for hyperestraier.
 %{__autoconf}
 %{__automake}
 %configure \
+	--enable-fcgi=%{?with_fcgi:yes}%{!?with_fcgi:no} \
 	--enable-static=%{?with_static_libs:yes}%{!?with_static_libs:no}
 %{__make}
 
@@ -156,14 +159,14 @@ cd javanative
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%configure
+%configure \
+	--enable-static=%{?with_static_libs:yes}%{!?with_static_libs:no}
 %{__make}
 cd -
 
 cd javapure
 %{__aclocal}
 %{__autoconf}
-#{__automake}
 %configure
 %{__make}
 cd -
@@ -215,6 +218,9 @@ rm -rf $RPM_BUILD_ROOT
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
+%post	javanative -p /sbin/ldconfig
+%postun	javanative -p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
 %doc ChangeLog README THANKS hyperestraier.sh
@@ -230,7 +236,7 @@ rm -rf $RPM_BUILD_ROOT
 # your cgi-bin directory
 %dir %{_libexecdir}
 %attr(755,root,root) %{_libexecdir}/*.cgi
-%attr(755,root,root) %{_libexecdir}/*.fcgi
+%{?with_fcgi:%attr(755,root,root) %{_libexecdir}/*.fcgi}
 %{_mandir}/man1/*
 %dir %{_datadir}/%{name}
 # config templates - don't add to %%config, don't move it to /etc
@@ -257,29 +263,39 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/lib*.so.*.*.*
+%attr(755,root,root) %{_libdir}/libestraier.so.*.*.*
 
 %files devel
 %defattr(644,root,root,755)
 %doc doc/*
 %attr(755,root,root) %{_bindir}/estconfig
-%attr(755,root,root) %{_libdir}/lib*.so
+%attr(755,root,root) %{_libdir}/libestraier.so
+%{_libdir}/libestraier.la
 %{_includedir}/*.h
 %{_pkgconfigdir}/*.pc
 %{_mandir}/man3/*
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/lib*.a
+%{_libdir}/libestraier.a
+%endif
 
+%if %{with java}
 %files javanative
 %defattr(644,root,root,755)
 %{_libdir}/estraier.jar
+%attr(755,root,root) %{_libdir}/libjestraier.so.*.*.*
+%attr(755,root,root) %{_libdir}/libjestraier.so
+%{_libdir}/libjestraier.la
+%{?with_static_libs:%{_libdir}/libjestraier.a}
 
 %files javapure
 %defattr(644,root,root,755)
 %{_libdir}/estraierpure.jar
+%endif
 
+%if %{with ruby}
 %files rubynative
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/estcmd.rb
@@ -289,3 +305,4 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/estcall.rb
 %{ruby_sitelibdir}/estraierpure.rb
+%endif
