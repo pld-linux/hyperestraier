@@ -1,7 +1,7 @@
-diff -Nur o.hyperestraier-1.2.2/Makefile.am n.hyperestraier-1.2.2/Makefile.am
---- o.hyperestraier-1.2.2/Makefile.am	1970-01-01 01:00:00.000000000 +0100
-+++ n.hyperestraier-1.2.2/Makefile.am	2006-04-21 22:32:24.000000000 +0200
-@@ -0,0 +1,74 @@
+diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
+--- b.hyperestraier-1.2.3/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ n.hyperestraier-1.2.3/Makefile.am	2006-04-29 14:59:31.000000000 +0200
+@@ -0,0 +1,81 @@
 +AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
 +				-DPIC=1 -D_REENTRANT=1 @MYDEFS@
 +
@@ -33,14 +33,21 @@ diff -Nur o.hyperestraier-1.2.2/Makefile.am n.hyperestraier-1.2.2/Makefile.am
 +estload_SOURCES = estload.c
 +estload_LDADD = libestraier.la
 +
++if FCGI
 +libexec_PROGRAMS = estseek.cgi estseek.fcgi
++else
++libexec_PROGRAMS = estseek.cgi
++endif
++
 +estseek_cgi_SOURCES = estseek.c
 +estseek_cgi_LDADD = libestraier.la 
 +
++if FCGI
 +estseek_fcgi_SOURCES = estseek.c
-+estseek_fcgi_CPPFLAGS = $(AM_CPPFLAGS) -DMYFCGI -I$(includedir)/fastcgi
++estseek_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
 +estseek_fcgi_LDADD = libestraier.la
-+estseek_fcgi_LDFLAGS = -lfcgi
++estseek_fcgi_LDFLAGS = @FCGI_LIBS@
++endif
 +
 +bin_SCRIPTS = estconfig estwolefind
 +
@@ -76,9 +83,9 @@ diff -Nur o.hyperestraier-1.2.2/Makefile.am n.hyperestraier-1.2.2/Makefile.am
 +
 +pkgconfigdir = $(libdir)/pkgconfig
 +pkgconfig_DATA = hyperestraier.pc
-diff -Nur o.hyperestraier-1.2.2/configure.in n.hyperestraier-1.2.2/configure.in
---- o.hyperestraier-1.2.2/configure.in	2006-04-10 03:25:26.000000000 +0200
-+++ n.hyperestraier-1.2.2/configure.in	2006-04-21 22:32:23.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
+--- b.hyperestraier-1.2.3/configure.in	2006-04-21 08:23:58.000000000 +0200
++++ n.hyperestraier-1.2.3/configure.in	2006-04-29 14:59:30.000000000 +0200
 @@ -9,12 +9,14 @@
  
  # Targets
@@ -171,15 +178,28 @@ diff -Nur o.hyperestraier-1.2.2/configure.in n.hyperestraier-1.2.2/configure.in
  # Enable MeCab morphological analyzer
  AC_ARG_ENABLE(mecab,
    AC_HELP_STRING([--enable-mecab], [feature mecab morphological analyzer]))
-@@ -127,6 +69,7 @@
+@@ -127,6 +69,20 @@
    enables="$enables (bzip)"
  fi
  
++# build estseek.fcgi binary
++AC_ARG_ENABLE(fcgi,
++  AS_HELP_STRING([--enable-fgci], [build additional estseek.fcgi binary with Fast CGI support (default=yes)]),,
++  enable_fcgi="yes")
++
++if test "$enable_fcgi" = "yes" ; then
++  AC_CHECK_LIB([fcgi], [main], [FCGI_LIBS="-lfcgi"], AC_MSG_ERROR([fcgi library not found. Bye.]))
++  AC_CHECK_HEADER([fastcgi/fastcgi.h],
++				  [FCGI_CPPFLAGS="-DMYFCGI -I${includedir}/fastcgi"],
++				  AC_MSG_ERROR([fcgi headres not found. Bye.]))
++fi
++AM_CONDITIONAL(FCGI, test "$enable_fcgi" = "yes")
++
 +
  # Messages
  printf '#================================================================\n'
  printf '# Configuring Hyper Estraier version %s%s.\n' "$PACKAGE_VERSION" "$enables"
-@@ -162,25 +105,12 @@
+@@ -162,25 +118,12 @@
  AC_CHECK_LIB(qdbm, main)
  
  # For libraries of pthreads
@@ -209,7 +229,7 @@ diff -Nur o.hyperestraier-1.2.2/configure.in n.hyperestraier-1.2.2/configure.in
  
  # Checking the version of QDBM with pkg-config
  if type pkg-config > /dev/null 2>&1
-@@ -207,6 +137,7 @@
+@@ -207,6 +150,7 @@
  # Export variables
  AC_SUBST(LIBVER)
  AC_SUBST(LIBREV)
@@ -217,10 +237,19 @@ diff -Nur o.hyperestraier-1.2.2/configure.in n.hyperestraier-1.2.2/configure.in
  AC_SUBST(PROTVER)
  AC_SUBST(MYCFLAGS)
  AC_SUBST(MYCPPOPTS)
-diff -Nur o.hyperestraier-1.2.2/javanative/Makefile.am n.hyperestraier-1.2.2/javanative/Makefile.am
---- o.hyperestraier-1.2.2/javanative/Makefile.am	1970-01-01 01:00:00.000000000 +0100
-+++ n.hyperestraier-1.2.2/javanative/Makefile.am	2006-04-21 22:32:24.000000000 +0200
-@@ -0,0 +1,29 @@
+@@ -217,6 +161,8 @@
+ AC_SUBST(MYAPPLIBS)
+ AC_SUBST(MYRUNPATH)
+ AC_SUBST(MYPOSTCMD)
++AC_SUBST(FCGI_LIBS)
++AC_SUBST(FCGI_CPPFLAGS)
+ 
+ # Targets
+ AC_OUTPUT(Makefile estconfig hyperestraier.pc)
+diff -Nur b.hyperestraier-1.2.3/javanative/Makefile.am n.hyperestraier-1.2.3/javanative/Makefile.am
+--- b.hyperestraier-1.2.3/javanative/Makefile.am	1970-01-01 01:00:00.000000000 +0100
++++ n.hyperestraier-1.2.3/javanative/Makefile.am	2006-04-29 14:59:31.000000000 +0200
+@@ -0,0 +1,26 @@
 +AM_CPPFLAGS = -I.. \
 +  -I$(MYJAVAHOME)/include -I$(MYJAVAHOME)/include/$(JVMPLATFORM) -I$(MYJAVAHOME)/Headers \
 +  -D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
@@ -232,7 +261,6 @@ diff -Nur o.hyperestraier-1.2.2/javanative/Makefile.am n.hyperestraier-1.2.2/jav
 +libjestraier_la_SOURCES = condition.c database.c document.c myconf.c result.c
 +libjestraier_la_LDFLAGS = -version-info @LIBVER@:@LIBREV@:@LIBAGE@
 +libjestraier_la_LIBADD = ../libestraier.la 
-+##@QDBM_LIBS@ @SKLIBS@ @MTLIBS@
 +
 +estraierdir = $(libdir)
 +estraier_JAVA = \
@@ -248,11 +276,9 @@ diff -Nur o.hyperestraier-1.2.2/javanative/Makefile.am n.hyperestraier-1.2.2/jav
 +	test -z "$(estraierdir)" || $(mkdir_p) "$(DESTDIR)$(estraierdir)" ; \
 +	echo " $(INSTALL_DATA) 'estraier.jar' '$(DESTDIR)$(estraierdir)/'"; \
 +	$(INSTALL_DATA) "estraier.jar" "$(DESTDIR)$(estraierdir)/";
-+
-+
-diff -Nur o.hyperestraier-1.2.2/javanative/configure.in n.hyperestraier-1.2.2/javanative/configure.in
---- o.hyperestraier-1.2.2/javanative/configure.in	2006-01-25 07:27:42.000000000 +0100
-+++ n.hyperestraier-1.2.2/javanative/configure.in	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/javanative/configure.in n.hyperestraier-1.2.3/javanative/configure.in
+--- b.hyperestraier-1.2.3/javanative/configure.in	2006-01-25 07:27:42.000000000 +0100
++++ n.hyperestraier-1.2.3/javanative/configure.in	2006-04-29 14:59:31.000000000 +0200
 @@ -9,46 +9,33 @@
  
  # Targets
@@ -310,7 +336,15 @@ diff -Nur o.hyperestraier-1.2.2/javanative/configure.in n.hyperestraier-1.2.2/ja
  
  
  #================================================================
-@@ -175,6 +162,7 @@
+@@ -146,7 +133,6 @@
+ AC_CHECK_LIB(lzo2, main)
+ AC_CHECK_LIB(bz2, main)
+ AC_CHECK_LIB(qdbm, main)
+-AC_CHECK_LIB(estraier, main)
+ 
+ # For libraries of pthreads
+ AC_CHECK_LIB(pthread, main, MYMTLIBS="-lpthread $MYMTLIBS",
+@@ -175,6 +161,7 @@
  # Export variables
  AC_SUBST(LIBVER)
  AC_SUBST(LIBREV)
@@ -318,9 +352,9 @@ diff -Nur o.hyperestraier-1.2.2/javanative/configure.in n.hyperestraier-1.2.2/ja
  AC_SUBST(MYJAVAHOME)
  AC_SUBST(JVMPLATFORM)
  AC_SUBST(JAVAC)
-diff -Nur o.hyperestraier-1.2.2/javapure/configure.in n.hyperestraier-1.2.2/javapure/configure.in
---- o.hyperestraier-1.2.2/javapure/configure.in	2006-01-25 07:27:50.000000000 +0100
-+++ n.hyperestraier-1.2.2/javapure/configure.in	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/javapure/configure.in n.hyperestraier-1.2.3/javapure/configure.in
+--- b.hyperestraier-1.2.3/javapure/configure.in	2006-01-25 07:27:50.000000000 +0100
++++ n.hyperestraier-1.2.3/javapure/configure.in	2006-04-29 14:59:31.000000000 +0200
 @@ -13,7 +13,7 @@
  # Export variables
  LIBVER=1
@@ -363,9 +397,9 @@ diff -Nur o.hyperestraier-1.2.2/javapure/configure.in n.hyperestraier-1.2.2/java
  
  
  
-diff -Nur o.hyperestraier-1.2.2/rubynative/Makefile.in n.hyperestraier-1.2.2/rubynative/Makefile.in
---- o.hyperestraier-1.2.2/rubynative/Makefile.in	2005-11-24 18:36:57.000000000 +0100
-+++ n.hyperestraier-1.2.2/rubynative/Makefile.in	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/rubynative/Makefile.in n.hyperestraier-1.2.3/rubynative/Makefile.in
+--- b.hyperestraier-1.2.3/rubynative/Makefile.in	2005-11-24 18:36:57.000000000 +0100
++++ n.hyperestraier-1.2.3/rubynative/Makefile.in	2006-04-29 14:59:31.000000000 +0200
 @@ -22,13 +22,13 @@
  prefix = @prefix@
  exec_prefix = @exec_prefix@
@@ -436,9 +470,9 @@ diff -Nur o.hyperestraier-1.2.2/rubynative/Makefile.in n.hyperestraier-1.2.2/rub
  	  -vs -gs -attr "@uri" -ord "@mdate NUMD" -max 1 casket "estraier OR mikio" > check.out
  	rm -rf casket
  
-diff -Nur o.hyperestraier-1.2.2/rubynative/configure.in n.hyperestraier-1.2.2/rubynative/configure.in
---- o.hyperestraier-1.2.2/rubynative/configure.in	2006-01-25 07:27:58.000000000 +0100
-+++ n.hyperestraier-1.2.2/rubynative/configure.in	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/rubynative/configure.in
+--- b.hyperestraier-1.2.3/rubynative/configure.in	2006-01-25 07:27:58.000000000 +0100
++++ n.hyperestraier-1.2.3/rubynative/configure.in	2006-04-29 14:59:31.000000000 +0200
 @@ -17,27 +17,11 @@
  MYRUNPATH=""
  
@@ -493,9 +527,9 @@ diff -Nur o.hyperestraier-1.2.2/rubynative/configure.in n.hyperestraier-1.2.2/ru
  AC_SUBST(MYRUNPATH)
  
  # Targets
-diff -Nur o.hyperestraier-1.2.2/rubynative/src/extconf.rb n.hyperestraier-1.2.2/rubynative/src/extconf.rb
---- o.hyperestraier-1.2.2/rubynative/src/extconf.rb	2006-01-17 09:45:22.000000000 +0100
-+++ n.hyperestraier-1.2.2/rubynative/src/extconf.rb	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/rubynative/src/extconf.rb n.hyperestraier-1.2.3/rubynative/src/extconf.rb
+--- b.hyperestraier-1.2.3/rubynative/src/extconf.rb	2006-01-17 09:45:22.000000000 +0100
++++ n.hyperestraier-1.2.3/rubynative/src/extconf.rb	2006-04-29 14:59:31.000000000 +0200
 @@ -2,12 +2,12 @@
  
  dir_config('estraier')
@@ -511,9 +545,9 @@ diff -Nur o.hyperestraier-1.2.2/rubynative/src/extconf.rb n.hyperestraier-1.2.2/
  $libs = "#{$libs} #{estlibs}"
  
  if have_header('estraier.h') and have_library('estraier')
-diff -Nur o.hyperestraier-1.2.2/rubypure/configure.in n.hyperestraier-1.2.2/rubypure/configure.in
---- o.hyperestraier-1.2.2/rubypure/configure.in	2006-01-25 07:28:05.000000000 +0100
-+++ n.hyperestraier-1.2.2/rubypure/configure.in	2006-04-21 22:32:24.000000000 +0200
+diff -Nur b.hyperestraier-1.2.3/rubypure/configure.in n.hyperestraier-1.2.3/rubypure/configure.in
+--- b.hyperestraier-1.2.3/rubypure/configure.in	2006-01-25 07:28:05.000000000 +0100
++++ n.hyperestraier-1.2.3/rubypure/configure.in	2006-04-29 14:59:31.000000000 +0200
 @@ -16,28 +16,11 @@
  MYRBLIBDIR=/usr/local/lib/ruby/site_ruby
  
