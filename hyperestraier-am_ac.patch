@@ -89,15 +89,15 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 @@ -9,12 +9,14 @@
  
  # Targets
- AC_INIT(hyperestraier, 1.2.3)
+ AC_INIT(hyperestraier, 1.2.4)
 +AM_INIT_AUTOMAKE([])
  
  # Export variables
 -LIBVER=8
--LIBREV=8
-+LIBVER=16
+-LIBREV=9
++LIBVER=17
 +LIBREV=0
-+LIBAGE=8
++LIBAGE=9
  PROTVER="1.0"
 -MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
 +MYCFLAGS=""
