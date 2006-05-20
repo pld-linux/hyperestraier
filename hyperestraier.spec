@@ -1,7 +1,7 @@
 #
 # Conditional build:
 %bcond_without	fcgi	# build estseek.fcgi
-%bcond_with	java	# Java bindings
+%bcond_without	java	# Java bindings
 %bcond_without	ruby	# Ruby bindings
 %bcond_without	static_libs	# don't build static libraries
 #
