@@ -3,9 +3,9 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +++ n.hyperestraier-1.2.3/Makefile.am	2006-04-29 14:59:31.000000000 +0200
 @@ -0,0 +1,81 @@
 +AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
-+				-DPIC=1 -D_REENTRANT=1 @MYDEFS@
++				-DPIC=1 -D_REENTRANT=1 @MYDEFS@ @MYCPPOPTS@
 +
-+AM_CFLAGS = -Wall -ansi -pedantic -fsigned-char
++AM_CFLAGS = @MYCFLAGS@
 +
 +lib_LTLIBRARIES = libestraier.la
 +libestraier_la_SOURCES = estraier.c estmtdb.c estnode.c md5.c
@@ -89,22 +89,22 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 @@ -9,12 +9,14 @@
  
  # Targets
- AC_INIT(hyperestraier, 1.2.6)
+ AC_INIT(hyperestraier, 1.3.6)
 +AM_INIT_AUTOMAKE([])
  
  # Export variables
 -LIBVER=8
--LIBREV=11
-+LIBVER=19
+-LIBREV=21
++LIBVER=29
 +LIBREV=0
-+LIBAGE=11
++LIBAGE=21
  PROTVER="1.0"
--MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
-+MYCFLAGS=""
+-MYCFLAGS="-Wall -fPIC -fsigned-char -O3 -fomit-frame-pointer -fforce-addr"
++MYCFLAGS="-Wall -fPIC -fsigned-char -fomit-frame-pointer -fforce-addr"
  MYCPPOPTS=""
- MYDEFS=""
+ MYDEFS="-DNDEBUG"
  MYLDOPTS=""
-@@ -24,72 +26,12 @@
+@@ -24,74 +26,12 @@
  MYRUNPATH=""
  MYPOSTCMD="true"
  
@@ -143,6 +143,7 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -if test "$enable_debug" = "yes"
 -then
 -  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g"
+-  MYDEFS=""
 -  MYLDOPTS="-static"
 -  enables="$enables (debug)"
 -fi
@@ -153,6 +154,7 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -if test "$enable_devel" = "yes"
 -then
 -  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -O2 -pipe"
+-  MYDEFS=""
 -  MYPOSTCMD="sync ; sync"
 -  enables="$enables (devel)"
 -fi
@@ -162,7 +164,7 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -  AC_HELP_STRING([--enable-profile], [build for profiling]))
 -if test "$enable_profile" = "yes"
 -then
--  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -g -pg -O2 -Werror"
+-  MYCFLAGS="-Wall -pedantic -fPIC -fsigned-char -g -pg -O2 -Werror"
 -  enables="$enables (profile)"
 -fi
 -
@@ -249,13 +251,13 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 diff -Nur b.hyperestraier-1.2.3/javanative/Makefile.am n.hyperestraier-1.2.3/javanative/Makefile.am
 --- b.hyperestraier-1.2.3/javanative/Makefile.am	1970-01-01 01:00:00.000000000 +0100
 +++ n.hyperestraier-1.2.3/javanative/Makefile.am	2006-04-29 14:59:31.000000000 +0200
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +AM_CPPFLAGS = -I.. \
 +  -I$(MYJAVAHOME)/include -I$(MYJAVAHOME)/include/$(JVMPLATFORM) -I$(MYJAVAHOME)/Headers \
 +  -D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
-+  -DPIC=1 -D_REENTRANT=1 -DNDEBUG @MYCPPOPTS@ @DEFS@
++  -DPIC=1 -D_REENTRANT=1 @MYCPPOPTS@ @DEFS@
 +
-+AM_CFLAGS = -Wall -pedantic -fsigned-char
++AM_CFLAGS = @MYCFLAGS@
 +
 +lib_LTLIBRARIES = libjestraier.la
 +libjestraier_la_SOURCES = condition.c database.c document.c myconf.c result.c
@@ -267,6 +269,7 @@ diff -Nur b.hyperestraier-1.2.3/javanative/Makefile.am n.hyperestraier-1.2.3/jav
 +	Cmd.java \
 +	Condition.java \
 +	Database.java \
++	DatabaseInformer.java \
 +	Document.java \
 +	Result.java \
 +	Utility.java
@@ -297,9 +300,9 @@ diff -Nur b.hyperestraier-1.2.3/javanative/configure.in n.hyperestraier-1.2.3/ja
  JAVAH="javah"
  JAVADOC="javadoc"
  JAVARUN="java"
--MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
-+#MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -DNDEBUG"
- MYCPPOPTS=""
+-MYCFLAGS="-Wall -fPIC -fsigned-char -O2 -fomit-frame-pointer -fforce-addr"
++MYCFLAGS="-Wall -fPIC -fsigned-char -fomit-frame-pointer -fforce-addr"
+ MYCPPOPTS="-DNDEBUG"
  MYLDOPTS=""
  MYMTLIBS=""
  MYSKLIBS=""
@@ -472,8 +475,8 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/Makefile.in n.hyperestraier-1.2.3/rub
  
 diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/rubynative/configure.in
 --- b.hyperestraier-1.2.3/rubynative/configure.in	2006-01-25 07:27:58.000000000 +0100
-+++ n.hyperestraier-1.2.3/rubynative/configure.in	2006-04-29 14:59:31.000000000 +0200
-@@ -17,27 +17,11 @@
++++ n.hyperestraier-1.2.3/rubynative/configure.in	2006-01-25 07:27:58.000000000 +0100
+@@ -17,33 +17,11 @@
  MYRUNPATH=""
  
  # Building paths
@@ -498,6 +501,12 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/ru
 -  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
 -fi
 -
+-# Setting the default prefix
+-if test "$prefix" = NONE
+-then
+-  prefix=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("prefix"))'`
+-fi
+-
 +PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
 +export PKG_CONFIG_PATH
 +PKG_PROG_PKG_CONFIG
@@ -506,7 +515,7 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/ru
  
  
  #================================================================
-@@ -67,6 +51,12 @@
+@@ -73,6 +51,11 @@
  then
    MYRBLIBDIR="$myrblibdir"
  fi
@@ -515,11 +524,10 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/ru
 +then
 +  MYRBARCHDIR="$myrbarchdir"
 +fi
-+
  
  # Checking the version of QDBM with pkg-config
  if type pkg-config > /dev/null 2>&1 && pkg-config --atleast-version=1.0.0 qdbm
-@@ -85,6 +75,7 @@
+@@ -91,6 +74,7 @@
  AC_SUBST(RUBY)
  AC_SUBST(RDOC)
  AC_SUBST(MYRBLIBDIR)
@@ -527,6 +535,7 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/configure.in n.hyperestraier-1.2.3/ru
  AC_SUBST(MYRUNPATH)
  
  # Targets
++++ n.hyperestraier-1.2.3/rubynative/configure.in	2006-04-29 14:59:31.000000000 +0200
 diff -Nur b.hyperestraier-1.2.3/rubynative/src/extconf.rb n.hyperestraier-1.2.3/rubynative/src/extconf.rb
 --- b.hyperestraier-1.2.3/rubynative/src/extconf.rb	2006-01-17 09:45:22.000000000 +0100
 +++ n.hyperestraier-1.2.3/rubynative/src/extconf.rb	2006-04-29 14:59:31.000000000 +0200
@@ -539,7 +548,8 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/src/extconf.rb n.hyperestraier-1.2.3/
  estcflags = `estconfig --cflags`.chomp
  estldflags = `estconfig --ldflags`.chomp
  estlibs = `estconfig --libs`.chomp
- $CFLAGS = "-I. -I.. -I../.. #{estcflags} -Wall #{$CFLAGS}"
+-$CFLAGS = "-I. -I.. -I../.. #{estcflags} -Wall #{$CFLAGS} -O3 -fomit-frame-pointer -fforce-addr"
++$CFLAGS = "-I. -I.. -I../.. #{estcflags} -Wall #{$CFLAGS}"
 -$LDFLAGS = "#{$LDFLAGS} -L. -L.. -L../.. #{estldflags}"
 +$LDFLAGS = "#{$LDFLAGS} -L. -L.. -L../.. -L../../.libs #{estldflags}"
  $libs = "#{$libs} #{estlibs}"
@@ -548,7 +558,7 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/src/extconf.rb n.hyperestraier-1.2.3/
 diff -Nur b.hyperestraier-1.2.3/rubypure/configure.in n.hyperestraier-1.2.3/rubypure/configure.in
 --- b.hyperestraier-1.2.3/rubypure/configure.in	2006-01-25 07:28:05.000000000 +0100
 +++ n.hyperestraier-1.2.3/rubypure/configure.in	2006-04-29 14:59:31.000000000 +0200
-@@ -16,28 +16,11 @@
+@@ -16,33 +16,11 @@
  MYRBLIBDIR=/usr/local/lib/ruby/site_ruby
  
  # Building paths
@@ -573,6 +583,11 @@ diff -Nur b.hyperestraier-1.2.3/rubypure/configure.in n.hyperestraier-1.2.3/ruby
 -  export PATH LIBRARY_PATH LD_LIBRARY_PATH CPATH PKG_CONFIG_PATH
 -fi
 -
+-# Setting the default prefix
+-if test "$prefix" = NONE
+-then
+-  prefix=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("prefix"))'`
+-fi
 -
 +PKG_CONFIG_PATH="..:$PKG_CONFIG_PATH"
 +export PKG_CONFIG_PATH
@@ -580,5 +595,5 @@ diff -Nur b.hyperestraier-1.2.3/rubypure/configure.in n.hyperestraier-1.2.3/ruby
 +PKG_CHECK_MODULES(QDBM, qdbm)
 +PKG_CHECK_MODULES(HYPERESTRAIER, hyperestraier)
  
+ 
  #================================================================
- # Checking Commands and Libraries
