@@ -8,12 +8,12 @@
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
-Version:	1.3.6
+Version:	1.4.2
 Release:	1
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
-# Source0-md5:	19747a7c16a319ed34bf3a048ae3662d
+# Source0-md5:	bc0baaa74f460866bf2ddb3b562d6080
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
@@ -21,7 +21,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_fcgi:BuildRequires:	fcgi-devel}
 BuildRequires:	libtool
-BuildRequires:	qdbm-devel >= 1.8.66
+BuildRequires:	qdbm-devel >= 1.8.68
 %{?with_java:BuildRequires:	jdk}
 %{?with_ruby:BuildRequires:	ruby-devel}
 Requires:	%{name}-libs = %{version}-%{release}

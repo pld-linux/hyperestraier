@@ -3,7 +3,7 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +++ n.hyperestraier-1.2.3/Makefile.am	2006-04-29 14:59:31.000000000 +0200
 @@ -0,0 +1,81 @@
 +AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
-+				-DPIC=1 -D_REENTRANT=1 @MYDEFS@ @MYCPPOPTS@
++				-DPIC=1 -D_THREAD_SAFE=1 -D_REENTRANT=1 @MYDEFS@ @MYCPPOPTS@
 +
 +AM_CFLAGS = @MYCFLAGS@
 +
@@ -89,15 +89,15 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 @@ -9,12 +9,14 @@
  
  # Targets
- AC_INIT(hyperestraier, 1.3.6)
+ AC_INIT(hyperestraier, 1.4.2)
 +AM_INIT_AUTOMAKE([])
  
  # Export variables
 -LIBVER=8
--LIBREV=21
-+LIBVER=29
+-LIBREV=27
++LIBVER=35
 +LIBREV=0
-+LIBAGE=21
++LIBAGE=27
  PROTVER="1.0"
 -MYCFLAGS="-Wall -fPIC -fsigned-char -O3 -fomit-frame-pointer -fforce-addr"
 +MYCFLAGS="-Wall -fPIC -fsigned-char -fomit-frame-pointer -fforce-addr"
@@ -255,7 +255,7 @@ diff -Nur b.hyperestraier-1.2.3/javanative/Makefile.am n.hyperestraier-1.2.3/jav
 +AM_CPPFLAGS = -I.. \
 +  -I$(MYJAVAHOME)/include -I$(MYJAVAHOME)/include/$(JVMPLATFORM) -I$(MYJAVAHOME)/Headers \
 +  -D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
-+  -DPIC=1 -D_REENTRANT=1 @MYCPPOPTS@ @DEFS@
++  -DPIC=1 -D_THREAD_SAFE=1 -D_REENTRANT=1 @MYCPPOPTS@ @DEFS@
 +
 +AM_CFLAGS = @MYCFLAGS@
 +
