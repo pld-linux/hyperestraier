@@ -5,6 +5,9 @@
 %bcond_without	ruby	# Ruby bindings
 %bcond_without	static_libs	# don't build static libraries
 #
+%ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
+%undefine with_java
+%endif
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
@@ -27,9 +30,6 @@ BuildRequires:	qdbm-devel >= 1.8.68
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%ifnarch %{ix86} %{x86_64}
-%undefine with_java
-%endif
 %define		_libexecdir	%{_libdir}/%{name}
 
 %description
