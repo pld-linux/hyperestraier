@@ -1,7 +1,7 @@
 diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 --- b.hyperestraier-1.2.3/Makefile.am	1970-01-01 01:00:00.000000000 +0100
 +++ n.hyperestraier-1.2.3/Makefile.am	2006-04-29 14:59:31.000000000 +0200
-@@ -0,0 +1,81 @@
+@@ -0,0 +1,92 @@
 +AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
 +				-DPIC=1 -D_THREAD_SAFE=1 -D_REENTRANT=1 @MYDEFS@ @MYCPPOPTS@
 +
@@ -13,7 +13,7 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +
 +include_HEADERS = estraier.h estmtdb.h estnode.h 
 +
-+bin_PROGRAMS = estcmd estmttest estmaster estcall estwaver estload
++bin_PROGRAMS = estcmd estmttest estmaster estbutler estcall estwaver estload
 +
 +estcmd_SOURCES = estcmd.c mymorph.c
 +estcmd_LDADD = libestraier.la
@@ -23,6 +23,9 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +
 +estmaster_SOURCES = estmaster.c mastermod.c myimage.dat
 +estmaster_LDADD = libestraier.la
++
++estbutler_SOURCES = estbutler.c mastermod.c
++estbutler_LDADD = libestraier.la
 +
 +estcall_SOURCES = estcall.c
 +estcall_LDADD = libestraier.la
@@ -34,19 +37,26 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +estload_LDADD = libestraier.la
 +
 +if FCGI
-+libexec_PROGRAMS = estseek.cgi estseek.fcgi
++libexec_PROGRAMS = estseek.cgi estseek.fcgi estfraud.cgi estfraud.fcgi
 +else
-+libexec_PROGRAMS = estseek.cgi
++libexec_PROGRAMS = estseek.cgi estfraud.cgi
 +endif
 +
 +estseek_cgi_SOURCES = estseek.c
 +estseek_cgi_LDADD = libestraier.la 
++
++estfraud_cgi_SOURCES = estfraud.c mastermod.c
++estfraud_cgi_LDADD = libestraier.la 
 +
 +if FCGI
 +estseek_fcgi_SOURCES = estseek.c
 +estseek_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
 +estseek_fcgi_LDADD = libestraier.la
 +estseek_fcgi_LDFLAGS = @FCGI_LIBS@
++estfraud_fcgi_SOURCES = estfraud.c mastermod.c
++estfraud_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
++estfraud_fcgi_LDADD = libestraier.la
++estfraud_fcgi_LDFLAGS = @FCGI_LIBS@
 +endif
 +
 +bin_SCRIPTS = estconfig estwolefind
@@ -58,6 +68,7 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +	estseek.conf \
 +	estseek.tmpl \
 +	estseek.top \
++	estfraud.conf \
 +	estresult.dtd \
 +	estraier.idl 
 +
@@ -89,15 +100,15 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 @@ -9,12 +9,14 @@
  
  # Targets
- AC_INIT(hyperestraier, 1.4.2)
+ AC_INIT(hyperestraier, 1.4.3)
 +AM_INIT_AUTOMAKE([])
  
  # Export variables
 -LIBVER=8
--LIBREV=27
-+LIBVER=35
+-LIBREV=28
++LIBVER=36
 +LIBREV=0
-+LIBAGE=27
++LIBAGE=28
  PROTVER="1.0"
 -MYCFLAGS="-Wall -fPIC -fsigned-char -O3 -fomit-frame-pointer -fforce-addr"
 +MYCFLAGS="-Wall -fPIC -fsigned-char -fomit-frame-pointer -fforce-addr"
