@@ -23,9 +23,11 @@ URL:		http://hyperestraier.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_fcgi:BuildRequires:	fcgi-devel}
+%{?with_java:BuildRequires:	jdk}
+%{?with_java:BuildRequires:	jpackage-utils}
 BuildRequires:	libtool
 BuildRequires:	qdbm-devel >= 1.8.68
-%{?with_java:BuildRequires:	jdk}
+%{?with_java:BuildRequires:	rpmbuild(macros) >= 1.300}
 %{?with_ruby:BuildRequires:	ruby-devel}
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -45,8 +47,8 @@ The characteristic of Hyper Estraier is the following:
  - Perfect recall ratio by N-gram method
  - High precision by hybrid mechanism of N-gram and morphological
    analyzer
- - Phrase search, regular expressions, attribute search, and
-   similarity search
+ - Phrase search, regular expressions, attribute search, and similarity
+   search
  - Multilingualism with Unicode
  - Independent of file format and repository
  - Simple and powerful API
@@ -157,6 +159,7 @@ Ruby pure bindings for hyperestraier.
 %{__make}
 
 %if %{with java}
+export JAVA_HOME="%{java_home}"
 cd javanative
 %{__libtoolize}
 %{__aclocal}
