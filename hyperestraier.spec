@@ -11,12 +11,12 @@
 Summary:	Full-text search system
 Summary(pl):	Pe³notekstowy system wyszukiwawczy
 Name:		hyperestraier
-Version:	1.4.4
+Version:	1.4.7
 Release:	1
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
-# Source0-md5:	bc6c51c1b046da3f98a14ecd7060a70e
+# Source0-md5:	4e827e9d5db019a863125f08f1080307
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
@@ -250,6 +250,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/estseek.conf
 %{_datadir}/%{name}/estseek.tmpl
 %{_datadir}/%{name}/estseek.top
+%{_datadir}/%{name}/estseek.help
 %{_datadir}/%{name}/estresult.dtd
 %{_datadir}/%{name}/estraier.idl
 %{_datadir}/%{name}/estfraud.conf
@@ -266,6 +267,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/%{name}/locale
 %lang(ja) %dir  %{_datadir}/%{name}/locale/ja
 %lang(ja) %{_datadir}/%{name}/locale/ja/estseek.conf
+%lang(ja) %{_datadir}/%{name}/locale/ja/estseek.help
 %lang(ja) %{_datadir}/%{name}/locale/ja/estseek.tmpl
 %lang(ja) %{_datadir}/%{name}/locale/ja/estseek.top
 
