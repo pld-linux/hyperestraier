@@ -9,7 +9,7 @@
 %undefine with_java
 %endif
 Summary:	Full-text search system
-Summary(pl):	Pe≥notekstowy system wyszukiwawczy
+Summary(pl.UTF-8):   Pe≈Çnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.9
 Release:	1
@@ -54,40 +54,40 @@ The characteristic of Hyper Estraier is the following:
  - Simple and powerful API
  - Supporting P2P architecture
 
-%description -l pl
-Hyper Estraier to system wyszukiwania pe≥notekstowego. Pozwala
-przeszukiwaÊ wiele dokumentÛw, aby odnaleºÊ dokumenty zawieraj±ce
-podane s≥owa. W przypadku uruchomienia na stronie WWW, moøe byÊ
-przydatny jako w≥asna wyszukiwarka stron we w≥asnym serwisie. Jest
-przydatny takøe do przeszukiwania skrzynek pocztowych i serwerÛw
-plikÛw.
+%description -l pl.UTF-8
+Hyper Estraier to system wyszukiwania pe≈Çnotekstowego. Pozwala
+przeszukiwaƒá wiele dokument√≥w, aby odnale≈∫ƒá dokumenty zawierajƒÖce
+podane s≈Çowa. W przypadku uruchomienia na stronie WWW, mo≈ºe byƒá
+przydatny jako w≈Çasna wyszukiwarka stron we w≈Çasnym serwisie. Jest
+przydatny tak≈ºe do przeszukiwania skrzynek pocztowych i serwer√≥w
+plik√≥w.
 
 Charakterystyka Hyper Estraiera:
- - duøa wydajno∂Ê przeszukiwania
- - duøa skalowalno∂Ê dokumentÛw docelowych
- - doskona≥y wspÛ≥czynnik odwo≥aÒ przy uøyciu metody N-gramowej
- - wysoka precyzja przy uøyciu hybrydowego mechanizmu N-gramowego i
+ - du≈ºa wydajno≈õƒá przeszukiwania
+ - du≈ºa skalowalno≈õƒá dokument√≥w docelowych
+ - doskona≈Çy wsp√≥≈Çczynnik odwo≈Ça≈Ñ przy u≈ºyciu metody N-gramowej
+ - wysoka precyzja przy u≈ºyciu hybrydowego mechanizmu N-gramowego i
    analizatora morfologicznego
- - wyszukiwanie fraz, wyraøeÒ regularnych, atrybutÛw oraz podobieÒst
- - wielojÍzyczno∂Ê z Unicode
- - niezaleøno∂Ê od formatu plikÛw i repozytorium
- - proste i potÍøne API
- - obs≥uga architektury P2P
+ - wyszukiwanie fraz, wyra≈ºe≈Ñ regularnych, atrybut√≥w oraz podobie≈Ñst
+ - wielojƒôzyczno≈õƒá z Unicode
+ - niezale≈ºno≈õƒá od formatu plik√≥w i repozytorium
+ - proste i potƒô≈ºne API
+ - obs≈Çuga architektury P2P
 
 %package libs
 Summary:	hyperestraier libraries
-Summary(pl):	Biblioteki hyperestraiera
+Summary(pl.UTF-8):   Biblioteki hyperestraiera
 Group:		Libraries
 
 %description libs
 hyperestraier libraries - full-text search system.
 
-%description libs -l pl
-Biblioteki hyperestraiera - pe≥notekstowego systemu wyszukiwawczego.
+%description libs -l pl.UTF-8
+Biblioteki hyperestraiera - pe≈Çnotekstowego systemu wyszukiwawczego.
 
 %package devel
 Summary:	Header files for hyperestraier library
-Summary(pl):	Pliki nag≥Ûwkowe biblioteki hyperestraier
+Summary(pl.UTF-8):   Pliki nag≈Ç√≥wkowe biblioteki hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -95,19 +95,19 @@ Requires:	%{name}-libs = %{version}-%{release}
 This is the package containing the header files for hyperestraier
 library.
 
-%description devel -l pl
-Ten pakiet zawiera pliki nag≥Ûwkowe biblioteki hyperestraier.
+%description devel -l pl.UTF-8
+Ten pakiet zawiera pliki nag≈Ç√≥wkowe biblioteki hyperestraier.
 
 %package static
 Summary:	Static hyperestraier library
-Summary(pl):	Statyczna biblioteka hyperestraier
+Summary(pl.UTF-8):   Statyczna biblioteka hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
 Static hyperestraier library.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Statyczna biblioteka hyperestraier.
 
 %package javanative
