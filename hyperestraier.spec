@@ -9,7 +9,7 @@
 %undefine with_java
 %endif
 Summary:	Full-text search system
-Summary(pl.UTF-8):   Pełnotekstowy system wyszukiwawczy
+Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.9
 Release:	1
@@ -76,7 +76,7 @@ Charakterystyka Hyper Estraiera:
 
 %package libs
 Summary:	hyperestraier libraries
-Summary(pl.UTF-8):   Biblioteki hyperestraiera
+Summary(pl.UTF-8):	Biblioteki hyperestraiera
 Group:		Libraries
 
 %description libs
@@ -87,7 +87,7 @@ Biblioteki hyperestraiera - pełnotekstowego systemu wyszukiwawczego.
 
 %package devel
 Summary:	Header files for hyperestraier library
-Summary(pl.UTF-8):   Pliki nagłówkowe biblioteki hyperestraier
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
@@ -100,7 +100,7 @@ Ten pakiet zawiera pliki nagłówkowe biblioteki hyperestraier.
 
 %package static
 Summary:	Static hyperestraier library
-Summary(pl.UTF-8):   Statyczna biblioteka hyperestraier
+Summary(pl.UTF-8):	Statyczna biblioteka hyperestraier
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
