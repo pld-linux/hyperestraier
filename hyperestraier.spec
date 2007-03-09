@@ -11,12 +11,12 @@
 Summary:	Full-text search system
 Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
-Version:	1.4.9
+Version:	1.4.10
 Release:	1
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
-# Source0-md5:	70e0533f1ca5247d8187afcb51b8d4e0
+# Source0-md5:	cf4ca3dea77d161517388050654b52a6
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
 URL:		http://hyperestraier.sourceforge.net/
@@ -26,7 +26,7 @@ BuildRequires:	automake
 %{?with_java:BuildRequires:	jdk}
 %{?with_java:BuildRequires:	jpackage-utils}
 BuildRequires:	libtool
-BuildRequires:	qdbm-devel >= 1.8.68
+BuildRequires:	qdbm-devel >= 1.8.75
 %{?with_java:BuildRequires:	rpmbuild(macros) >= 1.300}
 %{?with_ruby:BuildRequires:	ruby-devel}
 Requires:	%{name}-libs = %{version}-%{release}
@@ -254,6 +254,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}/estresult.dtd
 %{_datadir}/%{name}/estraier.idl
 %{_datadir}/%{name}/estfraud.conf
+%{_datadir}/%{name}/estproxy.conf
+%{_datadir}/%{name}/estscout.conf
+%{_datadir}/%{name}/estsupt.conf
 %dir %{_datadir}/%{name}/filter
 %{_datadir}/%{name}/filter/estfxmantotxt
 %{_datadir}/%{name}/filter/estfxmsotohtml

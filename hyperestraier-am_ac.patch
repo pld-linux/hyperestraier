@@ -1,7 +1,7 @@
 diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 --- b.hyperestraier-1.2.3/Makefile.am	1970-01-01 01:00:00.000000000 +0100
 +++ n.hyperestraier-1.2.3/Makefile.am	2006-04-29 14:59:31.000000000 +0200
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,118 @@
 +AM_CPPFLAGS =	-D_XOPEN_SOURCE_EXTENDED=1 -D_GNU_SOURCE=1 -D__EXTENSIONS__=1 -D_HPUX_SOURCE=1 \
 +				-DPIC=1 -D_THREAD_SAFE=1 -D_REENTRANT=1 @MYDEFS@ @MYCPPOPTS@
 +
@@ -37,9 +37,9 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +estload_LDADD = libestraier.la
 +
 +if FCGI
-+libexec_PROGRAMS = estseek.cgi estseek.fcgi estfraud.cgi estfraud.fcgi estproxy.cgi estproxy.fcgi
++libexec_PROGRAMS = estseek.cgi estseek.fcgi estfraud.cgi estfraud.fcgi estproxy.cgi estproxy.fcgi estscout.cgi estscout.fcgi estsupt.cgi estsupt.fcgi
 +else
-+libexec_PROGRAMS = estseek.cgi estfraud.cgi estproxy.cgi
++libexec_PROGRAMS = estseek.cgi estfraud.cgi estproxy.cgi estscout.cgi estsupt.cgi
 +endif
 +
 +estseek_cgi_SOURCES = estseek.c
@@ -50,6 +50,12 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +
 +estproxy_cgi_SOURCES = estproxy.c
 +estproxy_cgi_LDADD = libestraier.la 
++
++estscout_cgi_SOURCES = estscout.c
++estscout_cgi_LDADD = libestraier.la 
++
++estsupt_cgi_SOURCES = estsupt.c
++estsupt_cgi_LDADD = libestraier.la 
 +
 +if FCGI
 +estseek_fcgi_SOURCES = estseek.c
@@ -64,6 +70,14 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +estproxy_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
 +estproxy_fcgi_LDADD = libestraier.la
 +estproxy_fcgi_LDFLAGS = @FCGI_LIBS@
++estscout_fcgi_SOURCES = estscout.c
++estscout_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
++estscout_fcgi_LDADD = libestraier.la
++estscout_fcgi_LDFLAGS = @FCGI_LIBS@
++estsupt_fcgi_SOURCES = estsupt.c
++estsupt_fcgi_CPPFLAGS = $(AM_CPPFLAGS) @FCGI_CPPFLAGS@
++estsupt_fcgi_LDADD = libestraier.la
++estsupt_fcgi_LDFLAGS = @FCGI_LIBS@
 +endif
 +
 +bin_SCRIPTS = estconfig estwolefind
@@ -78,7 +92,10 @@ diff -Nur b.hyperestraier-1.2.3/Makefile.am n.hyperestraier-1.2.3/Makefile.am
 +	estseek.help \
 +	estfraud.conf \
 +	estresult.dtd \
-+	estraier.idl 
++	estraier.idl \
++	estproxy.conf \
++	estscout.conf \
++	estsupt.conf
 +
 +pkgdatafilterdir = $(pkgdatadir)/filter
 +pkgdatafilter_DATA = \
@@ -109,25 +126,26 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 @@ -9,12 +9,14 @@
  
  # Targets
- AC_INIT(hyperestraier, 1.4.9)
+ AC_INIT(hyperestraier, 1.4.10)
 +AM_INIT_AUTOMAKE([])
  
  # Export variables
 -LIBVER=8
--LIBREV=34
-+LIBVER=42
+-LIBREV=35
++LIBVER=43
 +LIBREV=0
-+LIBAGE=34
++LIBAGE=35
  PROTVER="1.0"
 -MYCFLAGS="-Wall -fPIC -fsigned-char -O3 -fomit-frame-pointer -fforce-addr"
 +MYCFLAGS="-Wall -fPIC -fsigned-char -fomit-frame-pointer -fforce-addr"
  MYCPPOPTS=""
  MYDEFS="-DNDEBUG"
  MYLDOPTS=""
-@@ -24,74 +26,12 @@
+@@ -25,87 +25,7 @@
+ MYAPPLIBS=""
  MYRUNPATH=""
  MYPOSTCMD="true"
- 
+-
 -# Building paths
 -pathtmp="$PATH"
 -PATH="$HOME/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
@@ -147,15 +165,15 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -fi
 -
 -
-+AC_PROG_LIBTOOL
- 
- #================================================================
- # Options
- #================================================================
- 
+-
+-#================================================================
+-# Options
+-#================================================================
+-
 -
 -# Internal variables
 -enables=""
+-stable="no"
 -
 -# Debug mode
 -AC_ARG_ENABLE(debug,
@@ -166,6 +184,7 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -  MYDEFS=""
 -  MYLDOPTS="-static"
 -  enables="$enables (debug)"
+-  stable="yes"
 -fi
 -
 -# Developping mode
@@ -177,6 +196,17 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -  MYDEFS=""
 -  MYPOSTCMD="sync ; sync"
 -  enables="$enables (devel)"
+-  stable="yes"
+-fi
+-
+-# Stable mode
+-AC_ARG_ENABLE(stable,
+-  AC_HELP_STRING([--enable-stable], [build for stable release]))
+-if test "$enable_stable" = "yes"
+-then
+-  MYCFLAGS="-Wall -ansi -pedantic -fPIC -fsigned-char -O2"
+-  enables="$enables (stable)"
+-  stable="yes"
 -fi
 -
 -# Profiling mode
@@ -196,10 +226,10 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -  MYLDOPTS="-static"
 -  enables="$enables (static)"
 -fi
--
++AC_PROG_LIBTOOL
+ 
  # Enable MeCab morphological analyzer
  AC_ARG_ENABLE(mecab,
-   AC_HELP_STRING([--enable-mecab], [feature mecab morphological analyzer]))
 @@ -127,6 +69,20 @@
    enables="$enables (bzip)"
  fi
@@ -434,7 +464,7 @@ diff -Nur b.hyperestraier-1.2.3/rubynative/Makefile.in n.hyperestraier-1.2.3/rub
  # Building binaries
  RUBY = @RUBY@
  RDOC = @RDOC@
--RUNENV = LD_LIBRARY_PATH=.:..:/lib:/usr/lib:$(HOME)/lib:/usr/local/lib:@MYRUNPATH@
+-RUNENV = LD_LIBRARY_PATH=.:..:/lib:/usr/lib:$(MYLIBDIR):$(HOME)/lib:/usr/local/lib:@MYRUNPATH@
  
  
  
