@@ -12,13 +12,14 @@ Summary:	Full-text search system
 Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.13
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Applications/Text
 Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
 # Source0-md5:	847aefb9e23266545280378d797f3981
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
+Patch1:		%{name}-ruby1.9.patch
 URL:		http://hyperestraier.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -147,6 +148,7 @@ Ruby pure bindings for hyperestraier.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__libtoolize}
