@@ -31,6 +31,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	qdbm-devel >= 1.8.75
 %{?with_java:BuildRequires:	rpmbuild(macros) >= 1.300}
 %{?with_ruby:BuildRequires:	ruby-devel}
+BuildRequires:	zlib-devel
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
