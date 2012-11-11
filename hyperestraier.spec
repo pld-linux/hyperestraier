@@ -1,8 +1,8 @@
 #
 # Conditional build:
-%bcond_without	fcgi	# build estseek.fcgi
-%bcond_without	java	# Java bindings
-%bcond_without	ruby	# Ruby bindings
+%bcond_without	fcgi		# build estseek.fcgi
+%bcond_without	java		# Java bindings
+%bcond_without	ruby		# Ruby bindings
 %bcond_without	static_libs	# don't build static libraries
 #
 %ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
@@ -13,9 +13,9 @@ Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.13
 Release:	2
-License:	LGPL
+License:	LGPL v2.1+
 Group:		Applications/Text
-Source0:	http://dl.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
+Source0:	http://downloads.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
 # Source0-md5:	847aefb9e23266545280378d797f3981
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
@@ -115,37 +115,53 @@ Statyczna biblioteka hyperestraier.
 
 %package javanative
 Summary:	Java native bindings for hyperestraier
-Group:		Development/Libraries
+Summary(pl.UTF-8):	Wiązania natywne Javy do hyperestraiera
+Group:		Libraries/Java
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description javanative
 Java native bindings for hyperestraier.
 
+%description javanative -l pl.UTF-8
+Wiązania natywne Javy do hyperestraiera.
+
 %package javapure
 Summary:	Java pure bindings for hyperestraier
+Summary(pl.UTF-8):	Wiązania Javy do hyperestraiera w czystej Javie
 License:	BSD-style
-Group:		Development/Libraries
+Group:		Libraries/Java
 
 %description javapure
 Java pure bindings for hyperestraier.
 
+%description javapure -l pl.UTF-8
+Wiązania Javy do hyperestraiera w czystej Javie.
+
 %package rubynative
 Summary:	Ruby native bindings for hyperestraier
-Group:		Development/Libraries
+Summary(pl.UTF-8):	Wiązania natywne języka Ruby do hyperestraiera
+Group:		Development/Languages
 Requires:	%{name}-libs = %{version}-%{release}
 %ruby_ver_requires_eq
 
 %description rubynative
 Ruby native bindings for hyperestraier.
 
+%description rubynative -l pl.UTF-8
+Wiązania natywne języka Ruby do hyperestraiera.
+
 %package rubypure
 Summary:	Ruby pure bindings
+Summary(pl.UTF-8):	Wiązania języka Ruby do hyperestraiera w czystym Rubym
 License:	BSD-style
 Group:		Development/Libraries
 %ruby_ver_requires_eq
 
 %description rubypure
 Ruby pure bindings for hyperestraier.
+
+%description rubypure -l pl.UTF-8
+Wiązania języka Ruby do hyperestraiera w czystym Rubym.
 
 %prep
 %setup -q
@@ -158,8 +174,8 @@ Ruby pure bindings for hyperestraier.
 %{__autoconf}
 %{__automake}
 %configure \
-	--enable-fcgi=%{?with_fcgi:yes}%{!?with_fcgi:no} \
-	--enable-static=%{?with_static_libs:yes}%{!?with_static_libs:no}
+	--enable-fcgi%{!?with_fcgi:=no} \
+	--enable-static%{!?with_static_libs:=no}
 %{__make}
 
 %if %{with java}
@@ -170,16 +186,14 @@ cd javanative
 %{__autoconf}
 %{__automake}
 %configure \
-	--enable-static=%{?with_static_libs:yes}%{!?with_static_libs:no}
+	--disable-static
 %{__make}
-cd -
-
-cd javapure
+cd ../javapure
 %{__aclocal}
 %{__autoconf}
 %configure
 %{__make}
-cd -
+cd ..
 %endif
 
 %if %{with ruby}
@@ -188,14 +202,12 @@ cd rubynative
 %{__autoconf}
 %configure
 %{__make}
-cd -
-
-cd rubypure
+cd ../rubypure
 %{__aclocal}
 %{__autoconf}
 %configure
 %{__make}
-cd -
+cd ..
 %endif
 
 %install
@@ -207,6 +219,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with java}
 %{__make} -C javanative install \
 	DESTDIR=$RPM_BUILD_ROOT
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libjestraier.la
 
 %{__make} -C javapure install \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -246,9 +259,13 @@ rm -rf $RPM_BUILD_ROOT
 # (shell script) instead, utilize SCRIPT_NAME env. var. and put into
 # your cgi-bin directory
 %dir %{_libexecdir}
-%attr(755,root,root) %{_libexecdir}/*.cgi
-%{?with_fcgi:%attr(755,root,root) %{_libexecdir}/*.fcgi}
-%{_mandir}/man1/*
+%attr(755,root,root) %{_libexecdir}/est*.cgi
+%{?with_fcgi:%attr(755,root,root) %{_libexecdir}/est*.fcgi}
+%{_mandir}/man1/estcall.1*
+%{_mandir}/man1/estcmd.1*
+%{_mandir}/man1/estconfig.1*
+%{_mandir}/man1/estmaster.1*
+%{_mandir}/man1/estwaver.1*
 %dir %{_datadir}/%{name}
 # config templates - don't add to %%config, don't move it to /etc
 %{_datadir}/%{name}/estseek.conf
@@ -281,6 +298,7 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libestraier.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libestraier.so.8
 
 %files devel
 %defattr(644,root,root,755)
@@ -288,9 +306,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/estconfig
 %attr(755,root,root) %{_libdir}/libestraier.so
 %{_libdir}/libestraier.la
-%{_includedir}/*.h
-%{_pkgconfigdir}/*.pc
-%{_mandir}/man3/*
+%{_includedir}/estmtdb.h
+%{_includedir}/estnode.h
+%{_includedir}/estraier.h
+%{_pkgconfigdir}/hyperestraier.pc
+%{_mandir}/man3/estnode.3*
+%{_mandir}/man3/estraier.3*
 
 %if %{with static_libs}
 %files static
@@ -301,11 +322,10 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with java}
 %files javanative
 %defattr(644,root,root,755)
-%{_libdir}/estraier.jar
 %attr(755,root,root) %{_libdir}/libjestraier.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libjestraier.so.1
 %attr(755,root,root) %{_libdir}/libjestraier.so
-%{_libdir}/libjestraier.la
-%{?with_static_libs:%{_libdir}/libjestraier.a}
+%{_libdir}/estraier.jar
 
 %files javapure
 %defattr(644,root,root,755)
