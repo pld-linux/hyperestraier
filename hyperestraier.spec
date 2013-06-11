@@ -12,7 +12,7 @@ Summary:	Full-text search system
 Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.13
-Release:	3
+Release:	4
 License:	LGPL v2.1+
 Group:		Applications/Text
 Source0:	http://downloads.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
@@ -20,6 +20,7 @@ Source0:	http://downloads.sourceforge.net/hyperestraier/%{name}-%{version}.tar.g
 Source1:	%{name}.sh
 Patch0:		%{name}-am_ac.patch
 Patch1:		%{name}-ruby1.9.patch
+Patch2:		ruby-vendor.patch
 URL:		http://hyperestraier.sourceforge.net/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -167,6 +168,7 @@ Wiązania języka Ruby do hyperestraiera w czystym Rubym.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %{__libtoolize}
@@ -336,10 +338,10 @@ rm -rf $RPM_BUILD_ROOT
 %files rubynative
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/estcmd.rb
-%attr(755,root,root) %{ruby_sitearchdir}/estraier.so
+%attr(755,root,root) %{ruby_vendorarchdir}/estraier.so
 
 %files rubypure
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/estcall.rb
-%{ruby_sitelibdir}/estraierpure.rb
+%{ruby_vendorlibdir}/estraierpure.rb
 %endif
