@@ -143,7 +143,6 @@ Summary:	Ruby native bindings for hyperestraier
 Summary(pl.UTF-8):	Wiązania natywne języka Ruby do hyperestraiera
 Group:		Development/Languages
 Requires:	%{name}-libs = %{version}-%{release}
-%ruby_ver_requires_eq
 
 %description rubynative
 Ruby native bindings for hyperestraier.
@@ -156,7 +155,6 @@ Summary:	Ruby pure bindings
 Summary(pl.UTF-8):	Wiązania języka Ruby do hyperestraiera w czystym Rubym
 License:	BSD-style
 Group:		Development/Libraries
-%ruby_ver_requires_eq
 
 %description rubypure
 Ruby pure bindings for hyperestraier.
