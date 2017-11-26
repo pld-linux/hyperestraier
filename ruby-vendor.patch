@@ -5,13 +5,13 @@
  
  # Librarh path
 -myrblibdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("sitelibdir"))'`
-+myrblibdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("vendorlibdir"))'`
++myrblibdir=`ruby -rrbconfig -e 'puts(RbConfig::CONFIG.fetch("vendorlibdir"))'`
  if test -n "$myrblibdir"
  then
    MYRBLIBDIR="$myrblibdir"
  fi
 -myrbarchdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("sitearchdir"))'`
-+myrbarchdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("vendorarchdir"))'`
++myrbarchdir=`ruby -rrbconfig -e 'puts(RbConfig::CONFIG.fetch("vendorarchdir"))'`
  if test -n "$myrbarchdir"
  then
    MYRBARCHDIR="$myrbarchdir"
@@ -22,7 +22,7 @@
  
  # Librarh path
 -myrblibdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("sitelibdir"))'`
-+myrblibdir=`ruby -rrbconfig -e 'puts(Config::CONFIG.fetch("vendorlibdir"))'`
++myrblibdir=`ruby -rrbconfig -e 'puts(RbConfig::CONFIG.fetch("vendorlibdir"))'`
  if test -n "$myrblibdir"
  then
    MYRBLIBDIR="$myrblibdir"

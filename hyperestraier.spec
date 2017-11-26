@@ -12,7 +12,7 @@ Summary:	Full-text search system
 Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.13
-Release:	8
+Release:	9
 License:	LGPL v2.1+
 Group:		Applications/Text
 Source0:	http://downloads.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
