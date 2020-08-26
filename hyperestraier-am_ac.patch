@@ -275,9 +275,9 @@ diff -Nur b.hyperestraier-1.2.3/configure.in n.hyperestraier-1.2.3/configure.in
 -then
 -  MYRUNPATH="$prefix/lib"
 -fi
-+AC_CHECK_LIB(nsl, main)
-+AC_CHECK_LIB(socket, main,)
-+AC_CHECK_LIB(resolv, main,)
++AC_SEARCH_LIBS(gethostname, nsl)
++AC_SEARCH_LIBS(socket, socket)
++AC_SEARCH_LIBS(gethostname, resolv)
  
  # Checking the version of QDBM with pkg-config
  if type pkg-config > /dev/null 2>&1
@@ -331,9 +331,8 @@ diff -Nur b.hyperestraier-1.2.3/javanative/Makefile.am n.hyperestraier-1.2.3/jav
 +	test -z "$(estraierdir)" || $(mkdir_p) "$(DESTDIR)$(estraierdir)" ; \
 +	echo " $(INSTALL_DATA) 'estraier.jar' '$(DESTDIR)$(estraierdir)/'"; \
 +	$(INSTALL_DATA) "estraier.jar" "$(DESTDIR)$(estraierdir)/";
-diff -Nur b.hyperestraier-1.2.3/javanative/configure.in n.hyperestraier-1.2.3/javanative/configure.in
---- b.hyperestraier-1.2.3/javanative/configure.in	2006-01-25 07:27:42.000000000 +0100
-+++ n.hyperestraier-1.2.3/javanative/configure.in	2006-04-29 14:59:31.000000000 +0200
+--- hyperestraier-1.4.13/javanative/configure.in.orig	2007-03-07 03:59:13.000000000 +0100
++++ hyperestraier-1.4.13/javanative/configure.in	2020-08-26 06:42:18.249781204 +0200
 @@ -9,46 +9,33 @@
  
  # Targets
@@ -391,15 +390,24 @@ diff -Nur b.hyperestraier-1.2.3/javanative/configure.in n.hyperestraier-1.2.3/ja
  
  
  #================================================================
-@@ -146,7 +133,6 @@
- AC_CHECK_LIB(lzo2, main)
- AC_CHECK_LIB(bz2, main)
- AC_CHECK_LIB(qdbm, main)
--AC_CHECK_LIB(estraier, main)
+@@ -150,16 +137,6 @@
+ AC_CHECK_SIZEOF(void *)
+ AC_CHECK_SIZEOF(int)
  
+-# Underlying libraries
+-AC_CHECK_LIB(c, main)
+-AC_CHECK_LIB(m, main)
+-AC_CHECK_LIB(iconv, main)
+-AC_CHECK_LIB(z, main)
+-AC_CHECK_LIB(lzo2, main)
+-AC_CHECK_LIB(bz2, main)
+-AC_CHECK_LIB(qdbm, main)
+-AC_CHECK_LIB(estraier, main)
+-
  # For libraries of pthreads
  AC_CHECK_LIB(pthread, main, MYMTLIBS="-lpthread $MYMTLIBS",
-@@ -175,6 +161,7 @@
+   AC_CHECK_LIB(c_r, main, MYMTLIBS="-lc_r $MYMTLIBS"))
+@@ -187,6 +164,7 @@
  # Export variables
  AC_SUBST(LIBVER)
  AC_SUBST(LIBREV)

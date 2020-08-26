@@ -1,3 +1,4 @@
+# TODO: perl binding
 #
 # Conditional build:
 %bcond_without	fcgi		# build estseek.fcgi
@@ -12,7 +13,7 @@ Summary:	Full-text search system
 Summary(pl.UTF-8):	Pełnotekstowy system wyszukiwawczy
 Name:		hyperestraier
 Version:	1.4.13
-Release:	11
+Release:	12
 License:	LGPL v2.1+
 Group:		Applications/Text
 Source0:	http://downloads.sourceforge.net/hyperestraier/%{name}-%{version}.tar.gz
